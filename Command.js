@@ -71,6 +71,16 @@ class Out extends Command {
   }
 }
 
+class Comment extends Command {
+  constructor(obj, collection) {
+    super(obj, collection)
+    this.fCell.textColor = this.fCell.commentColor
+    this.aCells.forEach(cell => {
+      cell.textColor = cell.commentColor
+    })
+  }
+}
+
 class Mute extends Command {
   constructor(obj, collection) {
     super(obj, collection)
@@ -98,6 +108,8 @@ const createCommand = (obj, collection) => {
       return new Out(obj, collection)
     case 'M':
       return new Mute(obj, collection)
+    case '_':
+      return new Comment(obj, collection)
   }
 }
 

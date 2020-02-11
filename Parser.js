@@ -52,7 +52,7 @@ class ParserSingleton {
 
     const parsedCommands = []
 
-    const knownCommands = ['P', 'D', 'O', 'C', 'M']
+    const knownCommands = ['P', 'D', 'O', 'C', 'M', '_']
 
     const keys = []
     commands.forEach(command => {

@@ -8,6 +8,7 @@ class Cell {
     this.flashColor = '#404040'
     this.textColor = '#afafaf'
     this.tween = null
+    this.commentColor = '#808080'
   }
 
   flash() {
