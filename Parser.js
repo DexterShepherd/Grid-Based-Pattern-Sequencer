@@ -1,5 +1,6 @@
 import { Store } from './Store'
 import { Collection } from './Command'
+import srs from 'secure-random-string'
 
 class ParserSingleton {
   getNeighbors(x, y) {
@@ -10,7 +11,6 @@ class ParserSingleton {
       [x, y - 1]
     ]
   }
-
   parse([x, y]) {
     const values = []
     const visited = []
@@ -44,7 +44,7 @@ class ParserSingleton {
       if (!commands[y]) {
         commands[y] = []
       }
-      commands[y].push({ x, cell })
+      commands[y].push({ x, cell, key: `${x}:${y}` })
       commands[y] = commands[y].sort((a, b) => a.x - b.x)
     })
 
@@ -52,19 +52,36 @@ class ParserSingleton {
 
     const parsedCommands = []
 
-    const knownCommands = ['P', 'D', 'O', 'C']
+    const knownCommands = ['P', 'D', 'O', 'C', 'M']
 
+    const keys = []
     commands.forEach(command => {
-      command.forEach(({ cell }) => {
+      command.forEach(({ cell, key }) => {
         if (knownCommands.indexOf(cell.value) !== -1) {
-          parsedCommands.push({ f: cell.value, a: [] })
+          parsedCommands.push({ f: [cell.value, cell], a: [] })
         } else {
-          parsedCommands[parsedCommands.length - 1].a.push(cell.value)
+          parsedCommands[parsedCommands.length - 1].a.push([cell.value, cell])
         }
+        keys.push(key)
       })
     })
 
-    Store.commands.push(new Collection(parsedCommands))
+    const commandId = srs(10)
+    let replacedCommand = null
+    keys.forEach(key => {
+      if (Store.commandKeys[key]) {
+        replacedCommand = Store.commandKeys[key]
+      }
+      Store.commandKeys[key] = commandId
+    })
+    if (replacedCommand) {
+      const index = Store.commands.findIndex(command => command.id == replacedCommand)
+      Store.commands[index].stop()
+    }
+
+    Store.commands.push(new Collection(parsedCommands, keys, commandId))
+
+    console.log(Store.commands)
   }
 }
 

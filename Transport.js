@@ -10,6 +10,7 @@ class Transport {
   }
 
   tick() {
+    Store.commands = Store.commands.filter(command => !command.dead)
     Store.commands.forEach(command => {
       command.tick(this.tickCount)
     })

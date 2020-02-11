@@ -7,9 +7,10 @@ class Renderer {
     console.log(this.id)
     this.canvas = document.getElementById(this.id)
     this.ctx = this.canvas.getContext('2d')
-    this.fillCol = '#303030'
-    this.cursorCol = 'rgba(0, 0, 0, 0.3)'
-    this.cursorStroke = '#808080'
+    this.fillCol = '#101010'
+    this.cursorCol = 'rgba(100, 100, 100, 0.3)'
+    this.cursorStroke = '#ffffff'
+    this.drawCursorStroke = false
     this.w = 640
     this.h = 640
     this.cellSize = this.w / 24
@@ -19,19 +20,20 @@ class Renderer {
   update() {
     for (let x = 0; x < this.w / this.cellSize; x += 1) {
       for (let y = 0; y < this.h / this.cellSize; y += 1) {
-        if (Store.cells[`${x}:${y}`]) {
+        const cell = Store.cells[`${x}:${y}`]
+        if (cell) {
           // draw the cell
-          this.ctx.fillStyle = '#505050'
+          this.ctx.fillStyle = cell.color
           const pos = [x * this.cellSize, y * this.cellSize]
           this.ctx.fillRect(pos[0], pos[1], this.cellSize, this.cellSize)
-          this.ctx.fillStyle = '#fff'
+          this.ctx.fillStyle = cell.textColor
           this.ctx.fillText(
-            Store.cells[`${x}:${y}`].value,
+            cell.value,
             x * this.cellSize + this.cellSize * 0.3,
             y * this.cellSize + this.cellSize * 0.8
           )
         } else {
-          this.ctx.fillStyle = '#505050'
+          this.ctx.fillStyle = '#202020'
           const pos = [
             x * this.cellSize + this.cellSize * 0.5 - this.cellSize * 0.05,
             y * this.cellSize + this.cellSize * 0.5 - this.cellSize * 0.05
@@ -42,11 +44,13 @@ class Renderer {
         if (Cursor.x == x && Cursor.y == y) {
           this.ctx.fillStyle = this.cursorCol
           this.ctx.fillRect(x * this.cellSize, y * this.cellSize, this.cellSize, this.cellSize)
-          this.ctx.strokeStyle = this.cursorStroke
-          this.ctx.beginPath()
-          this.ctx.moveTo(x * this.cellSize, y * this.cellSize + this.cellSize)
-          this.ctx.lineTo(x * this.cellSize + this.cellSize, y * this.cellSize + this.cellSize)
-          this.ctx.stroke()
+          if (this.drawCursorStroke) {
+            this.ctx.strokeStyle = this.cursorStroke
+            this.ctx.beginPath()
+            this.ctx.moveTo(x * this.cellSize, y * this.cellSize + this.cellSize)
+            this.ctx.lineTo(x * this.cellSize + this.cellSize, y * this.cellSize + this.cellSize)
+            this.ctx.stroke()
+          }
         }
       }
     }
