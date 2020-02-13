@@ -13,7 +13,7 @@ const ready = () => {
 const main = () => {
   ready().then(() => {
     const renderer = new Renderer('canvas')
-    const transport = new Transport(0.121)
+    const transport = new Transport(0.09)
     transport.start()
     renderer.render()
   })

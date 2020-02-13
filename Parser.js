@@ -80,8 +80,6 @@ class ParserSingleton {
     }
 
     Store.commands.push(new Collection(parsedCommands, keys, commandId))
-
-    console.log(Store.commands)
   }
 }
 

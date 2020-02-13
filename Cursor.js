@@ -9,6 +9,9 @@ class CursorSingleton {
     this.pos = [x, y]
     this.rows = 640 / (640 / 24)
     this.cols = 640 / (640 / 24)
+
+    this.offsetX = 500
+    this.offsetY = 500
     window.addEventListener('keydown', evt => this.onKey(evt))
   }
 

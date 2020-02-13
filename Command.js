@@ -32,8 +32,8 @@ class Pulse extends Command {
   }
 
   tick(currentTick) {
-    console.log('!')
     if (this.mode == 'div') {
+      console.log(currentTick % this.divider)
       if (currentTick % this.divider == 0) {
         this.collection.pulse(currentTick)
       }
@@ -52,10 +52,10 @@ class Data extends Command {
     this.readPos = 0
   }
   pulse() {
-    this.readPos += 1
     const index = this.readPos % this.arguments.length
     this.value = this.arguments[index]
     this.aCells[index].flash()
+    this.readPos += 1
   }
 }
 
@@ -135,7 +135,7 @@ class Collection {
   }
 
   tick(currentTick) {
-    if (currentTick % 4 == 0) {
+    if (currentTick % 16 == 0) {
       this.started = true
       if (this.dying) {
         this.dead = true
