@@ -4,7 +4,6 @@ import { Cursor } from './Cursor'
 class Renderer {
   constructor(id) {
     this.id = id
-    console.log(this.id)
     this.canvas = document.getElementById(this.id)
     this.ctx = this.canvas.getContext('2d')
     this.fillCol = '#101010'
@@ -20,7 +19,7 @@ class Renderer {
   update() {
     for (let x = 0; x < this.w / this.cellSize; x += 1) {
       for (let y = 0; y < this.h / this.cellSize; y += 1) {
-        const cell = Store.cells[`${x}:${y}`]
+        const cell = Store.cells[`${x + Cursor.offsetX}:${Cursor.offsetY + y}`]
         if (cell) {
           // draw the cell
           this.ctx.fillStyle = cell.color

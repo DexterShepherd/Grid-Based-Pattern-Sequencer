@@ -33,7 +33,6 @@ class Pulse extends Command {
 
   tick(currentTick) {
     if (this.mode == 'div') {
-      console.log(currentTick % this.divider)
       if (currentTick % this.divider == 0) {
         this.collection.pulse(currentTick)
       }
@@ -117,7 +116,6 @@ class Collection {
   constructor(commandObjs, keys, id) {
     this.id = id
     this.keys = keys
-    console.log(keys)
     this.commands = commandObjs.map(obj => createCommand(obj, this))
     this.commands.forEach((command, i) => {
       if (i > 0) {
