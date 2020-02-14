@@ -10,8 +10,10 @@ class Command {
     this.aCells = obj.a.map(([_, cell]) => cell)
     this.fCell = obj.f[1]
     this.collection = collection
-    this.value = 0
     this.parent = null
+    this.readPos = 0
+    this.fCell.isFunction(true)
+    this.aCells.forEach(cell => cell.isFunction(false))
   }
 
   tick() {}
@@ -51,10 +53,15 @@ class Data extends Command {
     this.readPos = 0
   }
   pulse() {
-    const index = this.readPos % this.arguments.length
-    this.value = this.arguments[index]
-    this.aCells[index].flash()
-    this.readPos += 1
+    this.aCells[this.index].flash()
+  }
+
+  get index() {
+    return this.readPos % this.arguments.length
+  }
+
+  get value() {
+    return this.arguments[this.index]
   }
 }
 
@@ -63,6 +70,7 @@ class Out extends Command {
     super(obj, collection)
   }
   pulse() {
+    this.parent.readPos += 1
     if (this.parent.value && this.collection.canPlay) {
       Midi.send(this.parent.value)
       this.fCell.flash()
@@ -97,6 +105,70 @@ class Mute extends Command {
   }
 }
 
+class Send extends Command {
+  constructor(obj, collection) {
+    super(obj, collection)
+    this.id = this.aCells.map(cell => cell.value).join('')
+    console.log(this.id)
+    this.event = new Event(`send-${this.id}`)
+  }
+  pulse() {
+    this.parent.readPos += 1
+    if (this.parent.value && this.collection.canPlay) {
+      // Midi.send(this.parent.value)
+      window.dispatchEvent(this.event, { value: this.parent.value })
+      this.fCell.flash()
+    }
+  }
+}
+
+class Receive extends Command {
+  constructor(obj, collection) {
+    super(obj, collection)
+    this.id = this.aCells.map(cell => cell.value).join('')
+    window.addEventListener(`send-${this.id}`, () => this.onEventTrigger())
+  }
+
+  onEventTrigger() {
+    this.collection.pulse()
+    this.fCell.flash()
+  }
+}
+
+class Switch extends Command {
+  constructor(obj, collection) {
+    super(obj, collection)
+    this._parent
+    this._readPos = 0
+  }
+
+  pulse() {
+    this.counter--
+    if (this.counter == 0) {
+      this._parent.readPos++
+      this.counter = this._parent.value
+      this._readPos += 1
+    }
+
+    this.aCells[this.index].flash()
+  }
+
+  set parent(p) {
+    if (p) {
+      this._parent = p
+      this.counter = p.value
+    }
+  }
+
+  get index() {
+    return this._readPos % this.arguments.length
+  }
+
+  get value() {
+    return this.arguments[this.index]
+  }
+}
+
 const createCommand = (obj, collection) => {
   switch (obj.f[0]) {
     case 'P':
@@ -107,6 +179,12 @@ const createCommand = (obj, collection) => {
       return new Out(obj, collection)
     case 'M':
       return new Mute(obj, collection)
+    case 'S':
+      return new Send(obj, collection)
+    case 'R':
+      return new Receive(obj, collection)
+    case 'W':
+      return new Switch(obj, collection)
     case '_':
       return new Comment(obj, collection)
   }

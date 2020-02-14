@@ -7,8 +7,8 @@ class CursorSingleton {
     this.x = x
     this.y = y
     this.pos = [x, y]
-    this.rows = 640 / (640 / 24)
-    this.cols = 640 / (640 / 24)
+    this.rows = 640 / (640 / 30)
+    this.cols = 640 / (640 / 30)
 
     this.offsetX = 500
     this.offsetY = 500
@@ -48,6 +48,12 @@ class CursorSingleton {
           this.addCell(cellKey, key)
         }
         break
+      case 'd':
+        if (ctrlKey) {
+          // mark cells to be deleted
+        } else {
+          this.addCell(cellKey, key)
+        }
       default:
         this.addCell(cellKey, key)
         return
